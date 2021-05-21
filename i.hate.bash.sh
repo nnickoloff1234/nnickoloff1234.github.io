@@ -36,7 +36,7 @@ done
 result="$result $NEWLINE </script></body></html>"
 
 
-echo $result
+echo "$result"
 #curl -X POST -H "Authorization: Bearer $apikey" -d 'name=asdf&clockTime=3&clockIncrement=2&minutes=60&startDate=1621522799&variant=crazyhouse' https://lichess.org/tournament/new
 #
 #| jq .id
