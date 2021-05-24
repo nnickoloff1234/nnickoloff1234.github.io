@@ -1,7 +1,7 @@
-#blunderman1 apikey=rvELvQYwuKItbtB6
+#blunderman1 apikey=XX
 
-apikey1=y4y4Pu6MRoDZhIPX #blundertulpa1
-apikey2=EuLzmogcYk4J5SIh #blundertulpa2
+apikey1=XX #blundertulpa1
+apikey2=XX #blundertulpa2
 
 starthour=(0	1	2	4	5	7	8	10	11	13	14	16	17	19	21	22	23)
 startmins=(0	0	57	0	57	0	57	0	57	0	57	0	57	0	30	0	0)
