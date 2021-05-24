@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>create zh tournaments</title>
+
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.css">
+
+	<style>
+		[v-cloak] {
+			display: none;
+		}
+		
+		.ui.table thead tr:first-child > th {
+			position: sticky !important;
+     		top: 0;
+     		z-index: 2;
+		}
+		.tooltip {
+			position: relative;
+			display: inline-block;
+		}
+
+		.tooltip .tooltiptext {
+			visibility: hidden;
+			background-color: black;
+			text-align: center;
+			padding: 5px 0;
+
+			/* Position the tooltip */
+			position: absolute;
+			z-index: 1;
+			top: -5px;
+		}
+
+		.tooltip:hover .tooltiptext {
+			visibility: visible;
+		}
+	</style>
+</head>
+<body>
+
+<h2 id="header1" class="ui header centered">
+	<span v-cloak>{{ message }}</span>
+</h2>
+
+<div id="table1" class="ui celled padded table">
+	
+	
+	<button v-on:click="testCreateTournament(1)" class="ui basic compact icon button">
+		<i class="plus icon"></i>
+	</button>
+
+	
+	<table id="table10" class="ui celled padded table">
+	<thead>
+	<tr>
+		<th>id</th>
+		<th>created by</th>
+		<th>system</th>
+		<th>variant</th>
+		<th>starts at</th>
+		<th>finishes at</th>
+		<th>minutes</th>
+		<th>clock</th>
+		<th>status</th>
+	</tr>
+	</thead>
+	<tbody>
+
+			
+	<tr v-for="tournament in tournaments">
+	    <td class="single line">
+	    	<a v-bind:href="'https://lichess.org/tournament/' + tournament.json['id']">{{tournament.json['fullName']}}</a></span>
+	    </td>
+		<td>
+			<span v-cloak>{{tournament.json['createdBy']}}</span>
+			
+		</td>
+		<td>
+			<span v-cloak>{{tournament.json['system']}}</span>
+		</td>
+		<td>
+			<span v-cloak>{{tournament.json['variant']['name']}}</span>
+		</td>
+		<td>
+			<span v-cloak>{{new Date(tournament.json['startsAt']).toLocaleString()}}</span>
+		</td>
+		<td>
+			<span v-cloak>{{new Date(tournament.json['finishesAt']).toLocaleString()}}</span>
+		</td>
+		<td>
+			<span v-cloak>{{tournament.json['minutes']}}</span>
+		</td>
+
+		<td>
+			<span v-cloak>{{tournament.json['clock']['limit']}} + {{tournament.json['clock']['increment']}}</span>
+		</td>
+		<td>
+			<span v-cloak>{{tournament.json['status']}}</span>
+		</td>
+
+	</tr>
+		</tbody>
+
+</table>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.13/semantic.min.js"></script>
+<script src="https://unpkg.com/vue"></script>
+
+<script>
+
+    var Server = function( serverName, prefixLetter, country ) {
+    	this.country = country;
+        this.name = serverName;
+        this.webui = "https://" + serverName;
+        this.rest = "https://" + serverName + "/" + prefixLetter + "/rest/";
+        this.status = '';
+        this.isLoading = true;
+        this.isAlive = false; // means unknown
+        this.isDead = false; // means unknown
+        this.version = '???';
+        this.database_last = '???';
+        this.database_last_single = '???';
+        this.database_datetime = '';
+        this.database_date = '';
+        this.database_expected = '???';
+        this.reportingModulesVersions  = '???';
+    }
+
+	var WsServer = function(sl, vcs, country) {
+		this.country = country;
+        this.version = "?";
+        this.serverLocation = sl;
+        this.versionCheckService = vcs;
+		this.isServerAlive = false;
+		this.isLoading = true;
+		this.status = "Down";
+	}
+	
+	var Tournament = function(json) {
+		this.json = json;
+	}
+
+    var header1 = new Vue({
+        el: '#header1',
+        data: {
+            message: 'Crazyhouse'
+        }
+    });
+    var table1 = new Vue({
+        el: '#table1',
+        data: {
+            tournamentsTulpas: [],
+            tournamentsStarted: [],
+            tournamentsCreated: [],
+            tournamentsFinished: [],
+            tournaments: []
+        },
+        created: function() { 
+		},
+        mounted: function() {
+			console.log("xxxxxx");
+			console.log(this.$data);
+		},
+        methods: {
+            /**
+             * Refresh a single server manually from Web UI by user request
+             */
+            testCreateTournament: function( v ) {
+				console.log(v);
+				var d = new Date();
+				var millis = d.getTime();
+				millis = millis + 60*1000;
+				console.log(millis);
+				var bb = "name=HourlyZH&clockTime=1&clockIncrement=1&minutes=60&startDate="+millis+"&variant=crazyhouse";
+				var bb = "";
+				//var bb = '{"name":"Hourly+ZH", "clockTime":"1", "clockIncrement":"1","minutes":"60","startDate":"'+millis+'",:variant":"crazyhouse"}';
+				console.log(bb);
+				
+				  const requestOptions = {  method: 'POST',
+											headers: { 
+											  'Authorization': 'Bearer rvELvQYwuKItbtB6'
+											},
+										    body: bb };
+										    
+			    fetch('https://lichess.org/api/tournament', requestOptions)
+			    
+			    .then( function( response ) {
+                    if ( !response.ok ) {
+                        throw new Exception( response.status )
+                    }
+                    return response.json()
+                }).then( function( json ) {
+				   console.info( "Received response ", json);
+
+				}).catch( function( error ) {
+                    console.info( "Received error ", error);
+                });
+				
+				//.then(response => response.json())
+				//.then(data => this.postId = data.id);
+				
+				
+				/*
+				
+				
+				
+			outerThis = this;
+
+            fetch( "https://lichess.org/api/tournament" ).then( function( response ) {
+                    if ( !response.ok ) {
+                        throw new Exception( response.status )
+                    }
+                    return response.json()
+                }).then( function( json ) {
+                    console.info( "Received response ", json);
+                    console.info("zzzzzzzzzzzzzzzzzzzzzzz");
+                    for (var x in json["started"]){
+						var t = json["started"][x];
+						outerThis.$data.tournamentsStarted.push(new Tournament(t));
+						if (t["variant"]["key"]=="crazyhouse"){
+							outerThis.$data.tournaments.push(new Tournament(t));
+						}
+					}
+					
+					for (var x in json["created"]){
+						var t = json["created"][x];
+						outerThis.$data.tournamentsCreated.push(new Tournament(t));
+						if (t["variant"]["key"]=="crazyhouse"){
+							outerThis.$data.tournaments.push(new Tournament(t));
+						}
+					}
+
+                    for (var x in json["finished"]){
+						var t = json["finished"][x];
+						outerThis.$data.tournamentsFinished.push(new Tournament(t));
+						console.log(">>>>>>>>>"+t["variant"]["key"]=="crazyhouse");
+						if (t["variant"]["key"]=="crazyhouse"){
+							outerThis.$data.tournaments.push(new Tournament(t));
+						}
+					}
+
+                    
+                }).catch( function( error ) {
+                    console.info( "Received error ", error);
+                });
+                
+				
+				*/
+            }
+        }
+    });
+
+</script>
+</body>
+</html>
